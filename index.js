@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const { graphqlHTTP } = require("express-graphql");
-
+const mongoose=  require('mongoose');
 const { buildSchema } = require('graphql');
 
 const app = express();
@@ -60,6 +60,15 @@ app.use(
   })
 );
 
+// connecting the database
+
+mongoose.connect(`mongodb://localhost:27017`)
+.then(()=>{
+    console.log("DB connected");
+})
+.catch(err=>{
+   console.log(err);
+}); 
 app.listen(3000, ()=>{
    console.log("Server is running");
 });
