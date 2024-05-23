@@ -42,7 +42,11 @@ app.use(
     `),
     rootValue: {
       events: () => {
-        return event;
+        // find method is used to query the database
+        return Event.find()
+        .then(events=>{
+          return events;
+      }).catch(err=> console.log(err));
       },
       createEvent: (args) => {
         // const event= {
