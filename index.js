@@ -4,10 +4,11 @@ const { graphqlHTTP } = require("express-graphql");
 const mongoose=  require('mongoose');
 const { buildSchema } = require('graphql');
 
+const Event= require("./models/event");
 const app = express();
 
 app.use(bodyParser.json());
-const events=[];
+
 app.use(
   '/graphql',
   graphqlHTTP({
@@ -41,19 +42,35 @@ app.use(
     `),
     rootValue: {
       events: () => {
-        return events;
+        return event;
       },
       createEvent: (args) => {
-        const event= {
-           _id: Math.random().toString(),
-           name: args.eventInput.name,
-           description: args.eventInput.description,
-           price:args.eventInput.price,
-           date: new Date().toISOString()
-        }
+        // const event= {
+        //    _id: Math.random().toString(),
+        //    name: args.eventInput.name,
+        //    description: args.eventInput.description,
+        //    price:args.eventInput.price,
+        //    date: new Date().toISOString()
+        // }
+        // we will now create an entry inside the MongoDB database
+        console.log("Hii");
+        console.log(args);
+        const event=new Event({
+          name: args.eventInput.name,
+          description: args.eventInput.description,
+          price:args.eventInput.price,
+          date: new Date(args.eventInput.date)
+        });
         console.log(event);
-        events.push(event);
-        return event;
+        // we have created an object now we need to save this inside DB. save() methods does that for us, it returns a promise like object
+       return   event.save()
+        .then((result)=>{
+           return result;
+        })
+        .catch(err=>{
+            console.log(err);
+        });// 
+        
       }
     },
     graphiql: true
@@ -62,7 +79,7 @@ app.use(
 
 // connecting the database
 
-mongoose.connect(`mongodb://localhost:27017`)
+mongoose.connect(`mongodb://localhost:27017/event-react-dev`)
 .then(()=>{
     console.log("DB connected");
 })
